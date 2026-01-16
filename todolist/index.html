@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>待办事件清单</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        
+        /* 容器 */
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* 头部 */
+        header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        header p {
+            font-size: 1.1rem;
+            font-weight: 300;
+            opacity: 0.9;
+        }
+        
+        /* 内容区域 */
+        main {
+            padding: 30px;
+        }
+        
+        /* 输入区域 */
+        .input-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            align-items: center;
+        }
+        
+        .input-section input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        .input-section input:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+        
+        .input-section button {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 25px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .input-section button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 172, 254, 0.3);
+        }
+        
+        .input-section button:active {
+            transform: translateY(0);
+        }
+        
+        /* 统计信息 */
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #4facfe;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        /* 待办事项列表 */
+        .todo-list {
+            list-style: none;
+        }
+        
+        .todo-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .todo-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .todo-item.completed {
+            background: #e8f5e8;
+            text-decoration: line-through;
+            color: #666;
+        }
+        
+        .todo-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+        }
+        
+        .todo-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #4facfe;
+        }
+        
+        .todo-text {
+            font-size: 1rem;
+            word-break: break-word;
+        }
+        
+        .todo-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .todo-actions button {
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-edit {
+            color: #ffc107;
+        }
+        
+        .btn-edit:hover {
+            background: #fff3cd;
+        }
+        
+        .btn-delete {
+            color: #dc3545;
+        }
+        
+        .btn-delete:hover {
+            background: #f8d7da;
+        }
+        
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #4facfe;
+            opacity: 0.5;
+        }
+        
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        /* 底部 */
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 0.9rem;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            header h1 {
+                font-size: 2rem;
+            }
+            
+            main {
+                padding: 20px;
+            }
+            
+            .input-section {
+                flex-direction: column;
+            }
+            
+            .input-section input {
+                width: 100%;
+            }
+            
+            .input-section button {
+                width: 100%;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+        
+        /* 编辑模式 */
+        .edit-mode {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+        
+        .edit-mode input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 2px solid #4facfe;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .edit-mode button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-save {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-save:hover {
+            background: #218838;
+        }
+        
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-cancel:hover {
+            background: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>
+                <i class="fas fa-check-circle"></i>
+                待办事件清单
+            </h1>
+            <p>高效管理你的日常任务</p>
+        </header>
+        
+        <main>
+            <div class="input-section">
+                <input type="text" id="todoInput" placeholder="添加新的待办事项..." maxlength="100">
+                <button id="addBtn" title="添加任务">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalCount">0</div>
+                    <div class="stat-label">总任务数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="activeCount">0</div>
+                    <div class="stat-label">未完成</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="completedCount">0</div>
+                    <div class="stat-label">已完成</div>
+                </div>
+            </div>
+            
+            <ul class="todo-list" id="todoList">
+                <!-- 待办事项将通过JavaScript动态添加 -->
+            </ul>
+            
+            <div class="empty-state" id="emptyState">
+                <i class="fas fa-inbox"></i>
+                <h3>暂无待办事项</h3>
+                <p>开始添加你的第一个任务吧！</p>
+            </div>
+        </main>
+        
+        <footer>
+            <p>&copy; 2024 待办事件清单 | 高效管理每一天</p>
+        </footer>
+    </div>
+    
+    <script>
+        // DOM元素
+        const todoInput = document.getElementById('todoInput');
+        const addBtn = document.getElementById('addBtn');
+        const todoList = document.getElementById('todoList');
+        const emptyState = document.getElementById('emptyState');
+        const totalCount = document.getElementById('totalCount');
+        const activeCount = document.getElementById('activeCount');
+        const completedCount = document.getElementById('completedCount');
+        
+        // 待办事项数据
+        let todos = [];
+        
+        // 初始化
+        function init() {
+            // 从localStorage加载数据
+            loadTodos();
+            // 渲染待办事项
+            renderTodos();
+            // 更新统计信息
+            updateStats();
+        }
+        
+        // 从localStorage加载待办事项
+        function loadTodos() {
+            const saved = localStorage.getItem('todos');
+            if (saved) {
+                todos = JSON.parse(saved);
+            }
+        }
+        
+        // 保存待办事项到localStorage
+        function saveTodos() {
+            localStorage.setItem('todos', JSON.stringify(todos));
+        }
+        
+        // 添加待办事项
+        function addTodo() {
+            const text = todoInput.value.trim();
+            if (text === '') return;
+            
+            const todo = {
+                id: Date.now(),
+                text: text,
+                completed: false
+            };
+            
+            todos.push(todo);
+            saveTodos();
+            renderTodos();
+            updateStats();
+            
+            // 清空输入框
+            todoInput.value = '';
+            // 聚焦输入框
+            todoInput.focus();
+        }
+        
+        // 切换待办事项完成状态
+        function toggleTodo(id) {
+            const todo = todos.find(t => t.id === id);
+            if (todo) {
+                todo.completed = !todo.completed;
+                saveTodos();
+                renderTodos();
+                updateStats();
+            }
+        }
+        
+        // 删除待办事项
+        function deleteTodo(id) {
+            todos = todos.filter(t => t.id !== id);
+            saveTodos();
+            renderTodos();
+            updateStats();
+        }
+        
+        // 编辑待办事项
+        function editTodo(id) {
+            const todo = todos.find(t => t.id === id);
+            if (!todo) return;
+            
+            const todoItem = document.querySelector(`[data-id="${id}"]`);
+            const contentDiv = todoItem.querySelector('.todo-content');
+            
+            // 创建编辑模式
+            const editMode = document.createElement('div');
+            editMode.className = 'edit-mode';
+            editMode.innerHTML = `
+                <input type="text" value="${todo.text}" maxlength="100">
+                <button class="btn-save" onclick="saveEdit(${id}, this)">保存</button>
+                <button class="btn-cancel" onclick="cancelEdit(this)">取消</button>
+            `;
+            
+            // 替换内容
+            contentDiv.innerHTML = '';
+            contentDiv.appendChild(editMode);
+            
+            // 聚焦输入框
+            const editInput = editMode.querySelector('input');
+            editInput.focus();
+            editInput.select();
+        }
+        
+        // 保存编辑
+        function saveEdit(id, button) {
+            const editMode = button.closest('.edit-mode');
+            const input = editMode.querySelector('input');
+            const newText = input.value.trim();
+            
+            if (newText === '') {
+                deleteTodo(id);
+                return;
+            }
+            
+            const todo = todos.find(t => t.id === id);
+            if (todo) {
+                todo.text = newText;
+                saveTodos();
+                renderTodos();
+                updateStats();
+            }
+        }
+        
+        // 取消编辑
+        function cancelEdit(button) {
+            renderTodos();
+        }
+        
+        // 渲染待办事项
+        function renderTodos() {
+            todoList.innerHTML = '';
+            
+            if (todos.length === 0) {
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            
+            todos.forEach(todo => {
+                const li = document.createElement('li');
+                li.className = `todo-item ${todo.completed ? 'completed' : ''}`;
+                li.setAttribute('data-id', todo.id);
+                
+                li.innerHTML = `
+                    <div class="todo-content">
+                        <input type="checkbox" class="todo-checkbox" ${todo.completed ? 'checked' : ''} onchange="toggleTodo(${todo.id})">
+                        <span class="todo-text">${todo.text}</span>
+                    </div>
+                    <div class="todo-actions">
+                        <button class="btn-edit" title="编辑" onclick="editTodo(${todo.id})"><i class="fas fa-edit"></i></button>
+                        <button class="btn-delete" title="删除" onclick="deleteTodo(${todo.id})"><i class="fas fa-trash"></i></button>
+                    </div>
+                `;
+                
+                todoList.appendChild(li);
+            });
+        }
+        
+        // 更新统计信息
+        function updateStats() {
+            const total = todos.length;
+            const completed = todos.filter(t => t.completed).length;
+            const active = total - completed;
+            
+            totalCount.textContent = total;
+            activeCount.textContent = active;
+            completedCount.textContent = completed;
+        }
+        
+        // 事件监听器
+        addBtn.addEventListener('click', addTodo);
+        
+        todoInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addTodo();
+            }
+        });
+        
+        // 初始化应用
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
